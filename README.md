@@ -40,3 +40,11 @@
 ## 许可
 
 加入的代码是 GPL-3.0-or-later（它链接进 OptiScaler，OptiScaler 是 GPL-3）。
+## 设置怎么保存（重要）
+
+- 面板里的开关/滑块：**立即生效，但重启就丢**（它们不写 ini）。
+- 面板的 **Save Settings**：会写 ini，但它写的是 OptiScaler 自己解析后的状态 —— `FGOutput`/`FGInput` 会变成 `auto`，调试键也会被写回去。**不要用它保存 latewarp 的配置。**（按了之后画面会出现黄/绿诊断热力图、模式也会跑丢，就是这个原因。）
+- 正确做法：
+  - 切模式：`.\latewarp_mode.ps1 -Mode mfg` 或 `-Mode old`，然后重启游戏；
+  - 被 Save 弄乱之后一键恢复：`.\latewarp_fix_ini.ps1`（把 14 个关键键写回出厂值）；
+  - 或者关闭游戏后直接编辑 `OptiScaler.ini`，重启生效。
