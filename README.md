@@ -1,0 +1,42 @@
+# Reflex2 latewarp — 两版发布
+
+同一个 latewarp（NGX feature 15）有两套正确的用法，按你**开不开帧生成**选一版：
+
+| | **v2-mfg**（适配帧生成） | **v1-legacy**（不适配帧生成） |
+|---|---|---|
+| 什么时候用 | 开帧生成（MFG / 多帧生成） | 不开帧生成 |
+| 扭曲在哪 | DLSS 输出上（机制 C）→ **生成帧继承 warp**，延迟下降 | OptiScaler 自己的帧生成 + present 链帧扭曲（老启用路径） |
+| 武器掩码 | 由游戏的 HUDLessColor tag 驱动（**只在它生成帧时存在**） | 老路径自带（当年验证过） |
+| 产物 | `v2-mfg/OptiScaler-v2-mfg.dll` + 补丁包 `Reflex2-P2-OptiScaler-1.0.0.zip` | `v1-legacy/OptiScaler-v1-legacy.dll`（2026-09-28 构建） |
+
+## 安装（两版一样，替换游戏里的 dxgi.dll）
+
+1. **关闭游戏**；
+2. 备份 `Cyberpunk 2077\bin\x64\dxgi.dll`；
+3. 把对应版本的 DLL 复制成 `Cyberpunk 2077\bin\x64\dxgi.dll`：
+   - v2：`v2-mfg/OptiScaler-v2-mfg.dll`
+   - v1：`v1-legacy/OptiScaler-v1-legacy.dll`
+4. 切配置（只改 ini 的四个键，不动其它）：
+   ```powershell
+   .\latewarp_mode.ps1 -Mode mfg    # 用 v2 时
+   .\latewarp_mode.ps1 -Mode old    # 用 v1 时
+   ```
+5. 启动游戏，在面板里勾上 **「接管开关 latewarp takeover: running」** 与 **「静态元素可视化 Show static elements」**。
+
+## 已知边界（如实写）
+
+- **v2**：武器掩码只在**游戏生成帧**时工作；关掉帧生成后 v2 只有扭曲、没有掩码（hudless 平面没有来源）。
+- **v1-legacy**：这是 2026-09-28 的旧二进制，**没有**后来的果冻修复、掩码阈值标定、深度裁切修正等改进；它能提供的是当年那条链路上验证过的扭曲 + 掩码。
+- 两版都要求 `[Reprojection] UseNvidiaLatewarp = true`、`[Latewarp] Rewrite = true`；不要动 FrameGen 的 FG Output / FG Input 下拉（用 `latewarp_mode.ps1` 改）。
+
+## 文件
+
+- `latewarp_mode.ps1` — 两套配置一键切换（只写 ini 四个键）
+- `USAGE_two_sets.md` — 更详细的配置说明与验证方法（看日志哪几行）
+- `install_p2_into_game.ps1` — 安装/卸载/指定 DLL
+- `v2-mfg/` — v2 的 DLL（E2c48）与补丁包 zip（含全部补丁脚本与源码）
+- `v1-legacy/` — v1 的老 DLL
+
+## 许可
+
+加入的代码是 GPL-3.0-or-later（它链接进 OptiScaler，OptiScaler 是 GPL-3）。
