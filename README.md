@@ -48,3 +48,17 @@
   - 切模式：`.\latewarp_mode.ps1 -Mode mfg` 或 `-Mode old`，然后重启游戏；
   - 被 Save 弄乱之后一键恢复：`.\latewarp_fix_ini.ps1`（把 14 个关键键写回出厂值）；
   - 或者关闭游戏后直接编辑 `OptiScaler.ini`，重启生效。
+## 面板（2026-10-07 清理后）
+
+**能调且生效的（保留）**：接管开关、静态元素可视化、遮罩阈值、warp 修正强度、深度截止、武器遮罩、warp 幅度、PresentOnly、Use NVIDIA latewarp。
+**已隐藏**：P3-3 诊断滑块、Feed composite 勾选框（它们的 ini 键仍然有效）。
+
+面板里的长标签已经移到控件**上方**，面板不会再被拉得很宽。
+
+## 文件清单（2026-10-07）
+
+- `latewarp_mode.ps1` —— 两套配置一键切换（`-Mode mfg` / `-Mode old`），写 ini 前自动备份
+- `latewarp_fix_ini.ps1` —— 面板 Save Settings 把配置弄乱后，一条命令写回出厂值，写前自动备份
+- `install_p2_into_game.ps1` —— 安装 / 卸载 / 指定 DLL（游戏在跑时会拒绝）
+- `USAGE_two_sets.md` —— 详细配置说明与日志验证方法
+- `BUGS_AND_ROBUSTNESS.md` —— 已知问题与健壮性记录（含 4 条待修，附实测证据）

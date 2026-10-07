@@ -35,6 +35,16 @@ $Repo = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot
 $ini = Join-Path $GameDir "OptiScaler.ini"
 if (-not (Test-Path -LiteralPath $ini)) { throw ("ini not found: " + $ini) }
 
+# robustness: warn when the game is up (the ini is only read at start) and always keep a backup
+if (Get-Process Cyberpunk2077 -ErrorAction SilentlyContinue) {
+    Write-Warning "Cyberpunk2077 is running: the change is only picked up after a restart."
+}
+function Backup-Ini([string]$path) {
+    $bak = $path + ".bak-" + (Get-Date -Format "yyyyMMdd-HHmmss")
+    Copy-Item -LiteralPath $path -Destination $bak -Force
+    Write-Host ("[ini] backup -> " + $bak)
+}
+
 if ($Mode -eq "mfg") {
     $pairs = @(@("FGOutput", "nofg"), @("FGInput", "DLSSG"), @("TagWarpInPlace", "true"), @("PresentOnly", "false"))
 } else {
@@ -51,6 +61,7 @@ foreach ($pair in $pairs) {
 Write-Host ("[mode] " + $Mode)
 foreach ($pair in $pairs) { Write-Host ("       " + $pair[0] + " = " + $pair[1]) }
 if ($DryRun) { Write-Host "[dry] nothing written"; exit 0 }
+Backup-Ini $ini
 [IO.File]::WriteAllText($ini, $t, (New-Object System.Text.UTF8Encoding($false)))
 Write-Host "       ini written -- restart the game to apply"
 
