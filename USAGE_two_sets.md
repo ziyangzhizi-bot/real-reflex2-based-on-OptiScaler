@@ -102,3 +102,16 @@ B 套如果 `latewarp-diag` 仍然是 0 行，或者粉色还是不出来 ——
 - 补丁 212 条 / 16 个文件 / `new files : 16`；`VERIFY-P2: PASS`、补丁审查 PASS、发布包 PASS
 - 存档：`_re/reflex2_mod/versions/OptiScaler_P3E2c45_9D4FB659B701.dll`
 - 本次 E2c44/E2c45 解决的问题：关帧生成时 `Reprojection_Dx12::SetResource` 从 **0** 变成每帧都有（深度 + hudless），目的是把 present 链的掩码/粉色遮罩拉回来。
+## 热切换（不用重启游戏）
+
+面板的中文快捷面板里多了一行：**「经典模式 Classic mode (present chain)」**
+
+| 勾选状态 | 等于 | 扭曲发生在 | 帧生成继承 warp？ |
+|---|---|---|---|
+| 不勾 | `-Mode mfg` | DLSS 输出（机制 C） | 是 |
+| 勾上 | `-Mode old` | present 链（显示帧） | 否 |
+
+- 它**立即生效**（两个键都是每帧读的），并且**不碰** `[FrameGen] FGOutput/FGInput` —— 那一对在运行中改动会打断平面喂图（见 `BUGS_AND_ROBUSTNESS.md` 的 B2），所以热切换只动 `TagWarpInPlace` + `PresentOnly`。
+- 切换时日志会打印一行：`latewarp hot mode: classic/present-chain (TagWarpInPlace false, PresentOnly true)` 或 `... mechanism-C/MFG ...`。
+- 想**持久化**这次选择：用 `latewarp_mode.ps1 -Mode mfg|old`（改 ini，重启后仍然生效）。
+- 注意：热切换只切"扭曲在哪一环"。要从"游戏/插件拥有帧生成"切到"OptiScaler 自己插帧"（`FGOutput=Reprojection` + `FGInput=upscaler`），仍然需要改 ini + 重启。
